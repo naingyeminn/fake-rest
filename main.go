@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+ 	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
@@ -39,6 +40,17 @@ func main() {
 				simulateError = true
 			}
 		}
+
+		if r.Method == http.MethodPost {
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				log.Printf("Error reading request body: %v", err)
+				return
+			}
+			defer r.Body.Close()
+			log.Printf("Received POST data: %s", string(body))
+    }
       
 		delay := 0 // Default delay of 0 seconds
 		delayEnv := os.Getenv("DELAY_SECONDS")
